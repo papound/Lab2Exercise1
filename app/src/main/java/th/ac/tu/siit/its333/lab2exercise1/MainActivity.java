@@ -14,6 +14,7 @@ public class MainActivity extends ActionBarActivity {
 
     // expr = the current string to be calculated
     StringBuffer expr;
+    int mem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,39 @@ public class MainActivity extends ActionBarActivity {
         //reference: http://stackoverflow.com/questions/2206378/how-to-split-a-string-but-also-keep-the-delimiters
         String e = expr.toString();
         String[] tokens = e.split("((?<=\\+)|(?=\\+))|((?<=\\-)|(?=\\-))|((?<=\\*)|(?=\\*))|((?<=/)|(?=/))");
+        int result=0,left,right;
+        String op="";
+
+        for(int i=0;i<tokens.length;i++){
+            if(tokens[i].equals("+")||tokens[i].equals("-")||tokens[i].equals("*")||tokens[i].equals("/")){
+                op = tokens[i];
+            }else{
+                if(op.equals("+")){
+                    result = result + Integer.parseInt(tokens[i]);
+                }else if(op.equals("-")){
+                    result = result - Integer.parseInt(tokens[i]);
+                }else if(op.equals("*")){
+                    result = result * Integer.parseInt(tokens[i]);
+                }else if(op.equals("/")){
+                    result = result / Integer.parseInt(tokens[i]);
+                }else{
+                    result = Integer.parseInt(tokens[i]);
+                }
+            }
+        }
+
+        TextView tvAns = (TextView)findViewById(R.id.tvAns);
+        tvAns.setText(Integer.toString(result));
+    }
+
+    public void equalClicked(View v) {
+
+        TextView tvAns = (TextView)findViewById(R.id.tvAns);
+        String ans = tvAns.getText().toString();
+        expr = new StringBuffer(ans);
+        updateExprDisplay();
+        int result=0;
+        tvAns.setText(Integer.toString(result));
     }
 
     public void digitClicked(View v) {
@@ -51,14 +85,28 @@ public class MainActivity extends ActionBarActivity {
 
     public void operatorClicked(View v) {
         //IF the last character in expr is not an operator and expr is not "",
-        //THEN append the clicked operator and updateExprDisplay,
-        //ELSE do nothing
+        String oc = ((TextView) v).getText().toString();
+        char oc_c = oc.charAt(0);
+        System.out.println(oc_c);
+        String expr_str = expr.toString();
+        int x = expr_str.length() - 1;
+        char last = expr_str.charAt(x);
+        if (!expr_str.isEmpty()) {
+
+            if (last != '+' && last != '-' && last != '*' && last != '/') {
+                expr.append(oc);
+                updateExprDisplay();
+            }
+        }
     }
 
     public void ACClicked(View v) {
         //Clear expr and updateExprDisplay
         expr = new StringBuffer();
         updateExprDisplay();
+        String expr_str = expr.toString();
+        TextView tvAns = (TextView)findViewById(R.id.tvAns);
+        tvAns.setText(expr_str);
         //Display a toast that the value is cleared
         Toast t = Toast.makeText(this.getApplicationContext(),
                 "All cleared", Toast.LENGTH_SHORT);
@@ -70,6 +118,9 @@ public class MainActivity extends ActionBarActivity {
         if (expr.length() > 0) {
             expr.deleteCharAt(expr.length()-1);
             updateExprDisplay();
+            String expr_str = expr.toString();
+            TextView tvAns = (TextView)findViewById(R.id.tvAns);
+            tvAns.setText(expr_str);
         }
     }
 
@@ -93,5 +144,38 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void Mem_expr(View v) {
+
+        int id = v.getId();
+        TextView tvAns = (TextView)findViewById(R.id.tvAns);
+        int result = Integer.parseInt(tvAns.getText().toString());
+        if(id == R.id.madd){
+            mem = mem+result;
+            Toast t = Toast.makeText(this.getApplicationContext(),
+                    "Mem = "+mem, Toast.LENGTH_SHORT);
+            t.show();
+        }else if(id == R.id.msub){
+            mem = mem-result;
+            Toast t = Toast.makeText(this.getApplicationContext(),
+                    "Mem = "+mem, Toast.LENGTH_SHORT);
+            t.show();
+        }else if(id == R.id.mr){
+            expr = new StringBuffer(Integer.toString(mem));
+            result = mem;
+            updateExprDisplay();
+            tvAns.setText(Integer.toString(result));
+            Toast t = Toast.makeText(this.getApplicationContext(),
+                    "Current Mem", Toast.LENGTH_SHORT);
+            t.show();
+        }else if(id == R.id.mc){
+            mem = 0;
+            Toast t = Toast.makeText(this.getApplicationContext(),
+                    "Mem = "+mem, Toast.LENGTH_SHORT);
+            t.show();
+        }
+
+
     }
 }
